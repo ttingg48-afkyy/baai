@@ -3,21 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BaraAi</title>
-
+  <title>BaraAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Creepster&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap');
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #000000 60%, #1a0000 100%);
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; background: #070707; overflow: hidden; font-family: 'Poppins', sans-serif; }
 
     header {
       text-align: center;
@@ -43,28 +33,76 @@
     }
 
     .msg {
-      max-width: 80%;
-      padding: 12px 15px;
+      max-width: 75%;
+      padding: 10px 14px;
       border-radius: 12px;
-      line-height: 1.5;
       word-wrap: break-word;
-      font-size: 0.95em;
+      font-size: 15px;
+      line-height: 1.5em;
       animation: fadeIn 0.3s ease;
     }
 
-    .user {
-      align-self: flex-end;
-      background: #b30000;
-      color: #fff;
-      box-shadow: 0 0 10px #ff0000;
+    .ai {
+      background: #161616;
+      color: #e7e7e7;
+      align-self: flex-start;
+      border: 1px solid #2a2a2a;
+      box-shadow: 0 0 6px #ff0000a0;
     }
 
-    .ai {
-      align-self: flex-start;
+    .user {
+      background: #9c0000;
+      color: #fff;
+      align-self: flex-end;
+      border: 1px solid #b30000;
+      box-shadow: 0 0 6px #b30000a0;
+    }
+
+    #input-area {
+      display: flex;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #0a0a0a;
+      border-top: 1px solid #111;
+      padding: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
       background: #1a1a1a;
-      border: 1px solid #330000;
-      color: #ffcccc;
-      box-shadow: 0 0 10px #330000;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    button {
+      background: #ff0000;
+      color: #fff;
+      border: none;
+      margin-left: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff0000aa;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #cc0000;
+      box-shadow: 0 0 15px #ff0000;
+    }
+
+    .typing {
+      font-style: italic;
+      color: #888;
+      align-self: flex-start;
+      animation: pulse 1s infinite;
     }
 
     @keyframes fadeIn {
@@ -72,114 +110,60 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    #inputBox {
-      display: flex;
-      gap: 10px;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.9);
-      border-top: 2px solid #330000;
-      position: sticky;
-      bottom: 0;
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
     }
 
-    input {
-      flex: 1;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      outline: none;
-      background: #111;
-      color: #fff;
-      font-size: 1em;
-      transition: box-shadow 0.2s;
-    }
-
-    input:focus {
-      box-shadow: 0 0 10px #ff0000;
-    }
-
-    button {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      background: #ff0000;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 10px #b30000;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background: #ff3333;
-      box-shadow: 0 0 15px #ff0000;
-    }
-
-    /* efek petir pas ngetik */
-    .flash {
-      position: absolute;
-      font-size: 18px;
-      color: #ff0000;
-      animation: flashAnim 0.2s ease;
-      pointer-events: none;
-    }
-
-    @keyframes flashAnim {
-      0% { opacity: 1; text-shadow: 0 0 10px #ff0000; transform: scale(1); }
-      100% { opacity: 0; text-shadow: none; transform: scale(0.5); }
+    @media (max-width: 600px) {
+      header { font-size: 1.7em; }
+      .msg { max-width: 90%; font-size: 14px; }
     }
   </style>
 </head>
-
 <body>
-  <header>BaraAi</header>
-  
-    <div id="chat-box">
+  <header>BaraAI</header>
+
+  <div id="chat-box">
     <div class="msg ai">Halo, aku BaraAI! Ngobrol santai aja 😄</div>
   </div>
-  
-  <div id="inputBox">
-    <input id="userInput" type="text" placeholder="Ketik pesan..." autocomplete="off" />
-    <button onclick="sendMessage()">Kirim</button>
+
+  <div id="input-area">
+    <input id="user-input" type="text" placeholder="Ketik pesan..." autocomplete="off" />
+    <button id="send-btn">Kirim</button>
   </div>
 
   <script>
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('userInput');
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    let history = [];
 
-        const rect = input.getBoundingClientRect();
-        span.style.left = rect.left + (Math.random() * rect.width) + 'px';
-        span.style.top = rect.top - 10 + 'px';
-
-        setTimeout(() => span.remove(), 150);
-      }
-    });
-
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage('user', text);
-      input.value = '';
-
-      const res = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await res.json();
-      const reply = data.reply || 'Ga ada respon.';
-
-      // efek ngetik smooth buat AI
-      await typeMessage(reply);
+    function addMessage(text, sender) {
+      const div = document.createElement('div');
+      div.className = `msg ${sender}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      if (sender === "ai") typeWriter(div, text);
+      else div.textContent = text;
     }
 
-    function appendMessage(role, text) {
-      const msg = document.createElement('div');
-      msg.className = 'msg ' + role;
-      msg.textContent = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
+    function typeWriter(element, text) {
+      let i = 0;
+      const speed = 15; // kecepatan ngetik
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          chatBox.scrollTop = chatBox.scrollHeight;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    }
+    
+    await typeMessage(reply);
     }
     
     function addTyping() {
@@ -190,19 +174,39 @@
       chatBox.scrollTop = chatBox.scrollHeight;
       return div;
     }
-    
-    async function typeMessage(text) {
-      const msg = document.createElement('div');
-      msg.className = 'msg ai';
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
 
-      for (let i = 0; i < text.length; i++) {
-        msg.textContent += text[i];
-        chat.scrollTop = chat.scrollHeight;
-        await new Promise(r => setTimeout(r, 20));
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+      addMessage(message, 'user');
+      userInput.value = '';
+
+      const typingDiv = addTyping();
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, history })
+        });
+
+        const data = await res.json();
+        chatBox.removeChild(typingDiv);
+        addMessage(data.reply, 'ai');
+
+        history.push({ role: 'user', text: message });
+        history.push({ role: 'ai', text: data.reply });
+      } catch (err) {
+        chatBox.removeChild(typingDiv);
+        addMessage('⚠️ Gagal konek ke server.', 'ai');
       }
     }
   </script>
 </body>
 </html>
+
