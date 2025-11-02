@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BaraAI</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    .logo {
+      font-size: 2rem;
+      margin-top: 10px;
+      color: red;
+      text-shadow: 0 0 15px red;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo span {
+      font-family: monospace;
+      letter-spacing: 3px;
+    }
+    .eye {
+      font-size: 1.5rem;
+      animation: blink 3s infinite;
+    }
+    @keyframes blink {
+      0%, 90%, 100% { opacity: 1; }
+      95% { opacity: 0; }
+    }
+    .chat-box {
+      flex: 1;
+      width: 100%;
+      max-width: 600px;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      margin: 10px 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      display: inline-block;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease;
+    }
+    .user {
+      background: #ff2e2e;
+      align-self: flex-end;
+      float: right;
+      clear: both;
+    }
+    .bot {
+      background: #1a1a1a;
+      border: 1px solid #ff2e2e50;
+      float: left;
+      clear: both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .input-area {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      background: #111;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: #222;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    button {
+      margin-left: 10px;
+      background: red;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #ff5050; }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <span>BARA<span style="color:white;">AI</span></span> <span class="eye">👁️</span>
+  </div>
+
+  <div class="chat-box" id="chatBox">
+    <div class="msg bot">Halo, aku BaraAI! Ngobrol santai aja 😄</div>
+  </div>
+
+  <div class="input-area">
+    <input id="userInput" type="text" placeholder="Ketik pesan..." />
+    <button id="sendBtn">Kirim</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function appendMessage(text, className) {
+      const msg = document.createElement("div");
+      msg.className = `msg ${className}`;
+      msg.innerHTML = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
+      return msg;
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text, "user");
+      input.value = "";
+
+      const typing = appendMessage("...", "bot");
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        });
+
+        const data = await res.json();
+        typing.remove();
+
+        const replyText = data.reply || "Maaf, aku gak ngerti 😅";
+        const botMsg = appendMessage("", "bot");
+
+        // animasi ngetik real-time
+        let i = 0;
+        const speed = 15; // semakin kecil semakin cepat
+        function type() {
+          if (i < replyText.length) {
+            botMsg.innerHTML += replyText.charAt(i);
+            i++;
+            chatBox.scrollTo({ top: chatBox.scrollHeight });
+            setTimeout(type, speed);
+          }
+        }
+        type();
+      } catch (err) {
+        typing.remove();
+        appendMessage("⚠️ Error koneksi ke server.", "bot");
+      }
+    }
+
+    sendBtn.onclick = sendMessage;
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
